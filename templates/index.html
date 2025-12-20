@@ -175,19 +175,25 @@ function vehicleUI() {
         }
       });
 
-      // Listen for HTMX swap to bind submodel change event
-      document.body.addEventListener('htmx:afterSwap', (evt) => {
-        if (evt.target && evt.target.id === 'submodelDiv') {
-          const submodelSelect = evt.target.querySelector('select[name="submodel"]');
-          if (submodelSelect) {
-            submodelSelect.addEventListener('change', (e) => {
-              this.selectedSubmodel = e.target.value;
-              const glassDiv = document.getElementById('glassTables');
-              if (glassDiv) glassDiv.style.display = 'block';
-            });
+        // Listen for HTMX swap to bind submodel change event
+        document.body.addEventListener('htmx:afterSwap', (evt) => {
+          if (evt.target && evt.target.id === 'submodelDiv') {
+            const submodelSelect = evt.target.querySelector('select[name="submodel"]');
+            if (submodelSelect) {
+              submodelSelect.removeAttribute('disabled');
+              submodelSelect.addEventListener('change', (e) => {
+                this.selectedSubmodel = e.target.value;
+                const glassDiv = document.getElementById('glassTables');
+                if (glassDiv) glassDiv.style.display = 'block';
+              });
+            }
+          } else if (evt.target && evt.target.id === 'modelDiv') {
+            const modelSelect = evt.target.querySelector('select[name="model"]');
+            if (modelSelect) {
+              modelSelect.removeAttribute('disabled');
+            }
           }
-        }
-      });
+        });
     }
   };
 }
