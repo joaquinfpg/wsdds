@@ -1,0 +1,11 @@
+<svg viewBox="0 5 1370 623" class="car-overlay" preserveAspectRatio="xMidYMid meet">
+  <path d="M371.938,146.583l-21.354,59.375l191.146-11.979l47.396-114.063C589.125,79.917,465.688,74.188,371.938,146.583z" class="glass-area" data-part="wfl" aria-label="Front Left Window" @click="selectPart($event.target)"
+  @mouseenter="!selectedPart && showTooltip($event.target)"
+  @mouseleave="!selectedPart && clearTooltip()" />
+  <path d="M624.021,79.81l-27.083,110.003l254.688-11.979l-43.229-77.083C808.396,100.75,715.688,79.808,624.021,79.81z" class="glass-area" data-part="wrl" aria-label="Rear Left Window" @click="selectPart($event.target)"
+  @mouseenter="!selectedPart && showTooltip($event.target)"
+  @mouseleave="!selectedPart && clearTooltip()" />
+  <path d="M1080.792,91.896l183.854,66.667c0,0-64.468,0.804-85.938,0c-10.438-0.391-41.666-3.125-41.666-3.125 s-13.512-1.468-18.021-1.9c-3.707-0.355-11.15-0.965-14.792-1.746c-1.781-0.382-5.212-1.64-6.934-2.232 c-34.187-11.755-81.088-29.681-136.391-48.041c-0.865-0.287-0.186-3.977,0.615-4.414c9.817-5.361,43.229-10.417,43.229-10.417 L1080.792,91.896z" class="glass-area" data-part="bg" aria-label="Back Glass" @click="selectPart($event.target)"
+  @mouseenter="!selectedPart && showTooltip($event.target)"
+  @mouseleave="!selectedPart && clearTooltip()" />
+</svg>

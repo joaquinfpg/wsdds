@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Submodels / {{ model.brand }} {{ model.year }} {{ model.name }}{% endblock %}
+
+{% block content %}
+<div class="container py-5 text-light">
+  <div class="d-flex flex-column flex-md-row align-items-start justify-content-between gap-3 mb-4">
+    <div>
+      <h1 class="display-5 fw-semibold mb-1">{{ model.brand }} {{ model.year }} – {{ model.name }}</h1>
+      <p class="text-muted mb-0">All submodels linked to this model. Use the IDs if you need to cross-reference the vehicle explorer.</p>
+    </div>
+    <a class="btn btn-outline-light btn-sm" href="{{ url_for('vpsearch_bp.vehicle_models', year_brand_id=model.year_brand_id) }}">Back to Models</a>
+  </div>
+
+    <form class="card border-secondary bg-body-tertiary shadow-sm p-3 mb-4" method="post" action="{{ url_for('vpsearch_bp.model_submodels', model_id=model.id) }}">
+      <p class="fw-semibold mb-2">Bulk add submodels</p>
+      <div class="d-flex flex-wrap gap-2 mb-3" style="max-height: 200px; overflow-y: auto;">
+        {% for value in submodel_choices %}
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="checkbox" name="submodels" value="{{ value }}" id="submodel-choice-{{ loop.index }}">
+          <label class="form-check-label small" for="submodel-choice-{{ loop.index }}">{{ value }}</label>
+        </div>
+        {% endfor %}
+      </div>
+      <div class="mt-3">
+        <label class="form-label small" for="newSubmodel">New submodel name</label>
+        <input class="form-control form-control-sm" type="text" id="newSubmodel" name="submodels" placeholder="Enter custom submodel name">
+      </div>
+      <button type="submit" class="btn btn-outline-light btn-sm mt-3">Add Submodels</button>
+    </form>
+
+    <div class="list-group list-group-flush">
+      {% for submodel in submodels %}
+        <div class="list-group-item list-group-item-dark d-flex justify-content-between align-items-center">
+          <div>
+            <strong class="text-light">{{ submodel.name }}</strong>
+            <span class="text-muted small">vehicle {{ submodel.vehicle_id }}</span>
+          </div>
+          <div class="d-flex gap-2 align-items-center">
+            <span class="badge bg-primary text-light">{{ submodel.part_count }}</span>
+            <span class="badge bg-secondary bg-opacity-50 text-light">ID {{ submodel.id }}</span>
+            <a class="btn btn-outline-light btn-sm" href="{{ url_for('vpsearch_bp.submodel_parts', submodel_id=submodel.id) }}">Edit Parts</a>
+          </div>
+        </div>
+      {% else %}
+    <div class="list-group-item list-group-item-dark text-muted">No submodels have been registered for this model yet.</div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

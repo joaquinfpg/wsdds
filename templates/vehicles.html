@@ -1,0 +1,204 @@
+{% extends "base.html" %}
+
+{% block title %}Vehicles{% endblock %}
+
+{% block content %}
+<div class="container py-5 text-light">
+  <div class="d-flex flex-column gap-4">
+    <div>
+      <h1 class="display-5 fw-semibold mb-2">Vehicles</h1>
+      <p class="text-muted mb-0">Browse year/brand pairings and refine them with the controls below before drilling into models.</p>
+    </div>
+
+    <form id="yearBrandForm" method="post" action="{{ url_for('vpsearch_bp.vehicles_page') }}">
+      <div class="card border-secondary bg-body-tertiary shadow-sm">
+        <div class="card-body">
+          <div class="row gy-3">
+            <div class="col-lg-4">
+              <label class="form-label mb-1" for="yearSelect">Year</label>
+              <select id="yearSelect" name="year_id" class="form-select form-select-sm">
+                <option value="">All years</option>
+                {% for year in years %}
+                <option value="{{ year.id }}">{{ year.year }}</option>
+                {% endfor %}
+              </select>
+            </div>
+              <div class="col-lg-8">
+              <label class="form-label mb-1">Brands</label>
+              <div id="brandCheckboxes" class="d-flex flex-wrap gap-2" style="max-height: 200px; overflow-y: auto;">
+                {% for brand in brands %}
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input brand-checkbox" name="brand_ids" type="checkbox" id="brand-{{ brand.id }}" value="{{ brand.id }}"
+                      data-is-truck="{{ 'true' if brand.is_truck else 'false' }}" data-is-active="{{ 'true' if brand.is_active else 'false' }}">
+                  <label class="form-check-label" for="brand-{{ brand.id }}">{{ brand.name }}</label>
+                </div>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+            <input type="hidden" name="selected_brand_ids" id="selectedBrandIdsInput" value="">
+            <div class="d-flex flex-wrap gap-4 align-items-center mt-3">
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="truckSwitch">
+                <label class="form-check-label" for="truckSwitch">Trucks</label>
+                <small class="d-block text-muted">Toggle between truck and non-truck brands.</small>
+              </div>
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="activeSwitch" checked>
+                <label class="form-check-label" for="activeSwitch">Active</label>
+                <small class="d-block text-muted">Switch between active and inactive brands.</small>
+              </div>
+            </div>
+          <div class="mt-4">
+            <label class="form-label" for="yearBrandSearch">Search mappings</label>
+            <input id="yearBrandSearch" type="search" class="form-control form-control-sm" placeholder="Filter by year or brand name">
+          </div>
+          <div class="d-flex flex-wrap gap-4 align-items-center mt-3">
+            <small class="text-muted">Save selected year + brand combinations as mappings.</small>
+            <button type="submit" class="btn btn-primary btn-sm ms-auto">Save mapping</button>
+          </div>
+        </div>
+      </div>
+    </form>
+
+    <div>
+      <h2 class="h5 mb-2">Selected mappings</h2>
+      <div id="selectedMappings" class="d-flex flex-wrap gap-2 small text-muted">
+        Select a year and at least one brand to preview selections.
+      </div>
+    </div>
+
+    <div>
+      <div class="d-flex align-items-center justify-content-between">
+        <h2 class="h5 mb-0">Year-Brand mappings</h2>
+        <span id="mappingCount" class="small text-muted"></span>
+      </div>
+      <div id="yearBrandList" class="list-group list-group-flush mt-2"></div>
+    </div>
+
+    <div class="text-end">
+      <button type="button" class="btn btn-outline-light btn-sm" onclick="window.history.back()">Back</button>
+    </div>
+  </div>
+</div>
+
+  <script>
+    const yearBrandEntries = {{ year_brand_mappings | tojson }};
+    const years = {{ years | tojson }};
+    const brands = {{ brands | tojson }};
+
+    const yearLookup = Object.fromEntries(years.map((row) => [String(row.id), row.year]));
+    const brandLookup = Object.fromEntries(brands.map((row) => [String(row.id), row.name]));
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const yearSelect = document.getElementById("yearSelect");
+      const searchInput = document.getElementById("yearBrandSearch");
+      const brandCheckboxes = Array.from(document.querySelectorAll(".brand-checkbox"));
+      const yearBrandList = document.getElementById("yearBrandList");
+      const selectedMappings = document.getElementById("selectedMappings");
+      const mappingCount = document.getElementById("mappingCount");
+      const truckSwitch = document.getElementById("truckSwitch");
+      const activeSwitch = document.getElementById("activeSwitch");
+      const yearBrandForm = document.getElementById("yearBrandForm");
+      const selectedBrandIdsInput = document.getElementById("selectedBrandIdsInput");
+
+      function renderSelectedMappings() {
+        selectedMappings.innerHTML = "";
+        const selectedYearId = yearSelect.value;
+        const selectedBrandIds = brandCheckboxes.filter((cb) => cb.checked).map((cb) => cb.value);
+
+        if (!selectedYearId || !selectedBrandIds.length) {
+          selectedMappings.innerHTML = '<span class="text-muted">Select a year and at least one brand to preview mappings.</span>';
+          return;
+        }
+
+        selectedBrandIds.forEach((brandId) => {
+          const badge = document.createElement("span");
+          badge.className = "badge bg-secondary text-light";
+          badge.textContent = `${yearLookup[selectedYearId]} – ${brandLookup[brandId]}`;
+          selectedMappings.appendChild(badge);
+        });
+      }
+
+      function renderList() {
+        const selectedYearId = yearSelect.value;
+        const selectedBrandIds = brandCheckboxes.filter((cb) => cb.checked).map((cb) => cb.value);
+        const searchTerm = searchInput.value.trim().toLowerCase();
+
+        const filtered = yearBrandEntries.filter((entry) => {
+          if (selectedYearId && String(entry.year_id) !== selectedYearId) {
+            return false;
+          }
+          if (selectedBrandIds.length && !selectedBrandIds.includes(String(entry.brand_id))) {
+            return false;
+          }
+          if (searchTerm) {
+            const haystack = `${entry.year} ${entry.brand_name}`.toLowerCase();
+            return haystack.includes(searchTerm);
+          }
+          return true;
+        });
+
+        yearBrandList.innerHTML = filtered.length
+          ? filtered
+              .map(
+                (entry) => `
+              <div class="list-group-item list-group-item-dark d-flex justify-content-between align-items-center">
+                <div>
+                  <strong class="text-light">${entry.year}</strong>
+                  <span class="text-muted"> / ${entry.brand_name}</span>
+                </div>
+                <div class="d-flex gap-2 align-items-center">
+                  <span class="badge bg-primary text-light">${entry.model_count}</span>
+                  <span class="badge bg-secondary bg-opacity-50 text-light">ID ${entry.id}</span>
+                  <a class="btn btn-outline-light btn-sm" href="/vehicles/models/${entry.id}">Edit Models</a>
+                </div>
+              </div>
+            `
+              )
+              .join("")
+          : '<div class="list-group-item list-group-item-dark text-muted">No mappings match the current filters.</div>';
+
+        mappingCount.textContent = `${filtered.length} shown`;
+      }
+
+      function updateBrandVisibility() {
+        const useTrucks = truckSwitch.checked;
+        const useActive = activeSwitch.checked;
+
+        brandCheckboxes.forEach((checkbox) => {
+          const wrapper = checkbox.closest(".form-check");
+          const isTruck = checkbox.dataset.isTruck === "true";
+          const isActive = checkbox.dataset.isActive === "true";
+          const matchesTruck = useTrucks ? isTruck : !isTruck;
+          const matchesActive = useActive ? isActive : !isActive;
+          const shouldShow = matchesTruck && matchesActive;
+          wrapper.style.display = shouldShow ? "" : "none";
+          if (!shouldShow) {
+            checkbox.checked = false;
+          }
+        });
+      }
+
+      function onFilterChange() {
+        updateBrandVisibility();
+        renderSelectedMappings();
+        renderList();
+      }
+
+      yearSelect.addEventListener("change", onFilterChange);
+      searchInput.addEventListener("input", renderList);
+      brandCheckboxes.forEach((checkbox) => checkbox.addEventListener("change", onFilterChange));
+      truckSwitch.addEventListener("change", onFilterChange);
+      activeSwitch.addEventListener("change", onFilterChange);
+      yearBrandForm?.addEventListener("submit", () => {
+        const selectedIds = brandCheckboxes.filter((cb) => cb.checked).map((cb) => cb.value);
+        if (selectedBrandIdsInput) {
+          selectedBrandIdsInput.value = selectedIds.join(",");
+        }
+      });
+
+      onFilterChange();
+    });
+  </script>
+{% endblock %}

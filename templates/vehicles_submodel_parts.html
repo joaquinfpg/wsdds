@@ -1,0 +1,213 @@
+{% extends "base.html" %}
+
+{% block title %}Parts / {{ submodel.name }}{% endblock %}
+
+{% block content %}
+<div class="container py-5 text-light">
+  <div class="d-flex flex-column flex-md-row align-items-start justify-content-between gap-3 mb-4">
+    <div>
+      <h1 class="display-5 fw-semibold mb-1">Parts for {{ submodel.name }}</h1>
+      <p class="text-muted mb-0">Submit new entries for the three primary glass categories tied to this submodel.</p>
+      <p class="small text-muted mb-0">Vehicle ID {{ submodel.vehicle_id }}</p>
+    </div>
+    <a class="btn btn-outline-light btn-sm" href="{{ url_for('vpsearch_bp.model_submodels', model_id=model_id) }}">Back to Submodels</a>
+  </div>
+
+    <div class="row g-4">
+    <div class="col-md-4">
+      <form data-kind="windshield" data-table="Windshield" data-part-field="windshield_part" data-side-field="windshield_side" class="card border-secondary bg-body-tertiary shadow-sm p-3 parts-confirm-form" method="post" action="{{ url_for('vpsearch_bp.submodel_parts', submodel_id=submodel.id) }}">
+        <input type="hidden" name="glass_type" value="windshield">
+          <h2 class="h6 text-uppercase text-muted">Windshield</h2>
+          <label class="form-label mt-3" for="windshieldPart">NAGS Part</label>
+          <input id="windshieldPart" name="windshield_part" class="form-control form-control-sm" type="text" placeholder="NAGS part number">
+          <label class="form-label mt-3" for="windshieldSide">Side</label>
+          <select id="windshieldSide" name="windshield_side" class="form-select form-select-sm">
+            <option value="">None</option>
+            <option value="L">Left</option>
+            <option value="R">Right</option>
+          </select>
+        <button class="btn btn-outline-light btn-sm w-100 mt-4" type="submit">Submit Windshield</button>
+      </form>
+      <div class="list-group list-group-flush mt-3">
+        <p class="fw-semibold small text-muted mb-2">Existing windshields</p>
+        {% if windshields %}
+        {% for item in windshields %}
+        <div class="list-group-item list-group-item-dark d-flex justify-content-between align-items-center">
+          <div>
+            <strong class="text-light">{{ item.nags_id }}</strong>
+            <p class="text-muted small mb-0">{{ item.description or 'No description' }}</p>
+          </div>
+          <span class="badge bg-secondary bg-opacity-50 text-light">{{ 'ADAS' if item.adas else 'Std' }}</span>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="text-muted small">No windshields recorded yet.</div>
+        {% endif %}
+      </div>
+    </div>
+    <div class="col-md-4">
+      <form data-kind="backglass" data-table="Backglass" data-part-field="backglass_part" data-side-field="backglass_side" class="card border-secondary bg-body-tertiary shadow-sm p-3 parts-confirm-form" method="post" action="{{ url_for('vpsearch_bp.submodel_parts', submodel_id=submodel.id) }}">
+        <input type="hidden" name="glass_type" value="backglass">
+          <h2 class="h6 text-uppercase text-muted">Back Glass</h2>
+          <label class="form-label mt-3" for="backglassPart">NAGS Part</label>
+          <input id="backglassPart" name="backglass_part" class="form-control form-control-sm" type="text" placeholder="NAGS part number">
+          <label class="form-label mt-3" for="backglassSide">Side</label>
+          <select id="backglassSide" name="backglass_side" class="form-select form-select-sm">
+            <option value="">None</option>
+            <option value="L">Left</option>
+            <option value="R">Right</option>
+          </select>
+        <button class="btn btn-outline-light btn-sm w-100 mt-4" type="submit">Submit Back Glass</button>
+      </form>
+      <div class="list-group list-group-flush mt-3">
+        <p class="fw-semibold small text-muted mb-2">Existing back glass</p>
+        {% if backglass %}
+        {% for item in backglass %}
+        <div class="list-group-item list-group-item-dark d-flex justify-content-between align-items-center">
+          <div>
+            <strong class="text-light">{{ item.nags_id }}</strong>
+            <p class="text-muted small mb-0">{{ item.description or 'No description' }}</p>
+          </div>
+          <span class="badge bg-secondary bg-opacity-50 text-light">Back Glass</span>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="text-muted small">No back glass records yet.</div>
+        {% endif %}
+      </div>
+    </div>
+    <div class="col-md-4">
+      <form data-kind="door_window" data-table="DoorWindow" data-part-field="door_window_part" data-side-field="door_window_side" data-position-field="door_window_position" class="card border-secondary bg-body-tertiary shadow-sm p-3 parts-confirm-form" method="post" action="{{ url_for('vpsearch_bp.submodel_parts', submodel_id=submodel.id) }}">
+        <input type="hidden" name="glass_type" value="door_window">
+        <h2 class="h6 text-uppercase text-muted">Door Window</h2>
+        <label class="form-label mt-3" for="doorWindowPart">NAGS Part</label>
+        <input id="doorWindowPart" name="door_window_part" class="form-control form-control-sm" type="text" placeholder="NAGS part number">
+        <label class="form-label mt-3" for="doorWindowSide">Side</label>
+        <select id="doorWindowSide" name="door_window_side" class="form-select form-select-sm">
+          <option value="">None</option>
+          <option value="L">Left</option>
+          <option value="R">Right</option>
+        </select>
+        <label class="form-label mt-3" for="doorWindowPosition">Position</label>
+        <select id="doorWindowPosition" name="door_window_position" class="form-select form-select-sm">
+           <option value="">None</option>
+           <option value="F">Front</option>
+           <option value="R">Rear</option>
+        </select>
+        <button class="btn btn-outline-light btn-sm w-100 mt-4" type="submit">Submit Door Window</button>
+      </form>
+      <div class="list-group list-group-flush mt-3">
+        <p class="fw-semibold small text-muted mb-2">Existing door windows</p>
+        {% if door_windows %}
+        {% for item in door_windows %}
+        <div class="list-group-item list-group-item-dark d-flex justify-content-between align-items-center">
+          <div>
+            <strong class="text-light">{{ item.nags_id }}</strong>
+            <p class="text-muted small mb-0">{{ item.description or 'No description' }}</p>
+            <p class="text-muted small mb-0">Side: {{ item.side or 'N/A' }}, Position: {{ item.position or 'N/A' }}</p>
+          </div>
+          <span class="badge bg-secondary bg-opacity-50 text-light">Door Window</span>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="text-muted small">No door windows recorded yet.</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="partsConfirmModal" tabindex="-1" aria-labelledby="partsConfirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content bg-dark border-secondary text-light">
+        <div class="modal-header border-0">
+          <h5 class="modal-title" id="partsConfirmModalLabel">Confirm part submission</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p class="mb-1">Table: <strong id="confirmTableName">Parts</strong></p>
+          <p class="mb-1">Part ID: <strong id="confirmPartId">Pending part</strong></p>
+          <ul class="list-unstyled small" id="confirmDetailsList">
+            <li>No additional metadata provided.</li>
+          </ul>
+        </div>
+        <div class="modal-footer border-0">
+          <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" id="confirmPartsSubmit" class="btn btn-primary btn-sm">Confirm and submit</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const modalEl = document.getElementById("partsConfirmModal");
+  const confirmTable = document.getElementById("confirmTableName");
+  const confirmPart = document.getElementById("confirmPartId");
+  const confirmDetails = document.getElementById("confirmDetailsList");
+  const confirmButton = document.getElementById("confirmPartsSubmit");
+  const bsModal = new bootstrap.Modal(modalEl);
+  let pendingForm = null;
+
+  function _renderList(items) {
+    confirmDetails.innerHTML = "";
+    if (!items.length) {
+      const li = document.createElement("li");
+      li.textContent = "No additional metadata provided.";
+      confirmDetails.appendChild(li);
+      return;
+    }
+    items.forEach((text) => {
+      const li = document.createElement("li");
+      li.textContent = text;
+      confirmDetails.appendChild(li);
+    });
+  }
+
+  document.querySelectorAll(".parts-confirm-form").forEach((form) => {
+    form.addEventListener("submit", (event) => {
+      if (form.dataset.confirmed === "true") {
+        delete form.dataset.confirmed;
+        return;
+      }
+      event.preventDefault();
+      pendingForm = form;
+      const tableName = form.dataset.table || "Parts";
+      confirmTable.textContent = tableName;
+      const partFieldName = form.dataset.partField;
+      const partValue = partFieldName
+        ? (form.querySelector(`[name="${partFieldName}"]`)?.value || "").trim()
+        : ""
+      ;
+      confirmPart.textContent = partValue || "Pending part";
+      const detailItems = [];
+      if (form.dataset.sideField) {
+        const sideValue = form.querySelector(`[name="${form.dataset.sideField}"]`)?.value;
+        if (sideValue) {
+          detailItems.push(`Side: ${sideValue}`);
+        }
+      }
+      if (form.dataset.positionField) {
+        const positionValue = form.querySelector(`[name="${form.dataset.positionField}"]`)?.value;
+        if (positionValue) {
+          detailItems.push(`Position: ${positionValue}`);
+        }
+      }
+      _renderList(detailItems);
+      bsModal.show();
+    });
+  });
+
+  confirmButton?.addEventListener("click", () => {
+    if (!pendingForm) {
+      return;
+    }
+    pendingForm.dataset.confirmed = "true";
+    bsModal.hide();
+    pendingForm.submit();
+  });
+
+  modalEl.addEventListener("hidden.bs.modal", () => {
+    pendingForm = null;
+  });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,7 @@
+<label for="model" class="form-label">Model</label>
+<select id="model" name="model" class="form-select" hx-get="/submodels" hx-target="#submodelDiv" hx-trigger="change" hx-include="#year,#brand,#model" {% if not models %}disabled{% endif %}>
+  <option value="" selected disabled>Select Model</option>
+  {% for m in models %}
+  <option value="{{ m.id }}">{{ m.model_name }}</option>
+  {% endfor %}
+</select>

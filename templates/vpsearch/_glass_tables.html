@@ -1,0 +1,62 @@
+
+
+<div class="mb-3">
+  <label for="zip" class="form-label">ZIP</label>
+  <input type="text" id="zip" name="zip" class="form-control" 
+         hx-get="/vpsearch/zip_autocomplete" 
+         hx-trigger="keyup changed delay:200ms" 
+         hx-target="#zip-suggestions" 
+         autocomplete="off">
+  <div id="zip-suggestions" class="list-group position-absolute" style="z-index:10;"></div>
+</div>
+
+{% if windshields and windshields|length > 0 %}
+  <h3>Windshields</h3>
+  <table class="table table-dark table-striped" id="windshieldsTable">
+    <thead><tr><th>ID</th><th>Description</th><th>ADAS</th><th>Price</th><th>Side</th></tr></thead>
+    <tbody>
+      {% for p in windshields %}
+      <tr>
+        <td>{{ p.nags_id }}</td>
+        <td>{{ p.description or '' }}</td>
+        <td>{{ 'Yes' if p.adas else 'No' }}</td>
+        <td>{{ p.price }}</td>
+        <td>{{ p.side or '' }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endif %}
+
+{% if backglass and backglass|length > 0 %}
+  <h3>Backglass</h3>
+  <table class="table table-dark table-striped" id="backglassTable">
+    <thead><tr><th>ID</th><th>Description</th><th>Side</th></tr></thead>
+    <tbody>
+      {% for p in backglass %}
+      <tr>
+        <td>{{ p.nags_id }}</td>
+        <td>{{ p.description or '' }}</td>
+        <td>{{ p.side or '' }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endif %}
+
+{% if door_windows and door_windows|length > 0 %}
+  <h3>Door Windows</h3>
+  <table class="table table-dark table-striped" id="doorWindowsTable">
+    <thead><tr><th>ID</th><th>Description</th><th>Side</th><th>Position</th></tr></thead>
+    <tbody>
+      {% for p in door_windows %}
+      <tr>
+        <td>{{ p.nags_id }}</td>
+        <td>{{ p.description or '' }}</td>
+        <td>{{ p.side or '' }}</td>
+        <td>{{ p.position or '' }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endif %}

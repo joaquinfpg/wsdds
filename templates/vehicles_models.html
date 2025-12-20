@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}Models / {{ year_brand.brand }} {{ year_brand.year }}{% endblock %}
+
+{% block content %}
+<div class="container py-5 text-light">
+  <div class="d-flex flex-column flex-md-row align-items-start justify-content-between gap-3 mb-4">
+    <div>
+      <h1 class="display-5 fw-semibold mb-1">{{ year_brand.brand }} {{ year_brand.year }}</h1>
+      <p class="text-muted mb-0">Browse models tied to this year-brand pairing and use the search box to focus on a specific name.</p>
+    </div>
+    <a class="btn btn-outline-light btn-sm" href="{{ url_for('vpsearch_bp.vehicles_page') }}">Back to Vehicles</a>
+  </div>
+
+  <form class="card border-secondary bg-body-tertiary shadow-sm p-3 mb-4" method="post" action="{{ url_for('vpsearch_bp.vehicle_models', year_brand_id=year_brand.id) }}">
+    <div class="row g-3 align-items-end">
+      <div class="col-md-8">
+        <label class="form-label" for="modelName">Model Name</label>
+        <input id="modelName" name="model_name" class="form-control form-control-sm" type="text" placeholder="Enter new model" required>
+      </div>
+      <div class="col-md-4 text-md-end">
+        <button type="submit" class="btn btn-outline-light btn-sm w-100">Add Model</button>
+      </div>
+    </div>
+  </form>
+
+  <div class="card border-secondary bg-body-tertiary shadow-sm p-3">
+    <label class="form-label mb-2" for="modelSearch">Filter models</label>
+    <input id="modelSearch" class="form-control form-control-sm" type="search" placeholder="Type to filter model names">
+  </div>
+
+  <div class="list-group list-group-flush mt-4" id="modelList"></div>
+  <div id="modelEmpty" class="text-muted small mt-3" style="display: none;">No models match your search.</div>
+</div>
+
+<script id="model-data" type="application/json">{{ models | tojson }}</script>
+<script>
+  const modelsData = JSON.parse(document.getElementById("model-data").textContent || "[]");
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const modelList = document.getElementById("modelList");
+    const modelSearch = document.getElementById("modelSearch");
+    const modelEmpty = document.getElementById("modelEmpty");
+
+    function renderModels(filter = "") {
+      const normalized = filter.trim().toLowerCase();
+      const filtered = normalized
+        ? modelsData.filter((model) => model.name.toLowerCase().includes(normalized))
+        : modelsData;
+
+      if (!filtered.length) {
+        modelList.innerHTML = "";
+        modelEmpty.style.display = "block";
+        return;
+      }
+
+      modelEmpty.style.display = "none";
+      modelList.innerHTML = filtered
+        .map(
+          (model) => `
+            <div class="list-group-item list-group-item-dark d-flex justify-content-between align-items-center">
+              <div>
+                <span>${model.name}</span>
+              </div>
+                <div class="d-flex gap-2 align-items-center">
+                  <span class="badge bg-primary text-light">${model.submodel_count}</span>
+                  <a class="btn btn-outline-light btn-sm" href="${model.submodel_url}">Edit Submodels</a>
+                  <span class="badge bg-secondary bg-opacity-50 text-light">ID ${model.id}</span>
+                </div>
+            </div>
+          `
+        )
+        .join("");
+    }
+
+    modelSearch.addEventListener("input", () => renderModels(modelSearch.value));
+    renderModels();
+  });
+</script>
+{% endblock %}

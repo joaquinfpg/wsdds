@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+{% block title %}Vehicle Lookup{% endblock %}
+{% block content %}
+<div x-data="vehicleUI()" x-init="init()">
+  <!-- Toggle Front/Rear View Button -->
+  <div class="d-flex justify-content-center align-items-center mb-2">
+    <button type="button" class="btn btn-light p-1" style="border:none;background:transparent;outline:none;" @click="toggleView">
+      <svg width="32" height="32" viewBox="0 0 24 24">
+        <path fill="#ff0000" d="m9 20l-1.4-1.4l1.75-1.8q-3.2-.425-5.275-1.75T2 12q0-2.075 2.888-3.538T12 7q4.225 0 7.113 1.463T22 12q0 1.55-1.663 2.775T16 16.6v-2.05q1.925-.5 2.963-1.238T20 12q0-.8-2.138-1.9T12 9q-3.725 0-5.863 1.1T4 12q0 .6 1.275 1.438T8.9 14.7l-1.3-1.3L9 12l4 4l-4 4Z"/>
+      </svg>
+    </button>
+  </div>
+  <!-- Car Image Containers -->
+  <div class="container car-container position-relative my-4" x-show="showFront">
+    <img src="/static/front.webp" class="img-fluid car-image" alt="Front View" loading="lazy" />
+    {% include 'partials/front.html' %}
+    <div id="global-tooltip-rear" class="glass-tooltip" style="display: none;"></div>
+  </div>
+  <div class="container car-container position-relative my-4" x-show="!showFront">
+    <img src="/static/rear.webp" class="img-fluid car-image" alt="Rear View" loading="lazy" />
+    {% include 'partials/rear.html' %}
+    <div id="global-tooltip-rear" class="glass-tooltip" style="display: none;"></div>
+  </div> 
+
+</div>
+<div>
+  <!-- Vehicle Form -->
+  <form id="vehicleForm">
+    <input type="hidden" id="selected_part" name="selected_part" :value="selectedPart">
+    <div class="mb-3" x-show="selectedPart">
+  <label for="year" class="form-label">Year</label>
+  <select id="year" name="year" class="form-select"
+          hx-get="/brands"
+          hx-target="#brandDiv"
+          hx-trigger="change"
+          hx-include="#year">
+    <option selected disabled>Select Year</option>
+    {% for y in years %}
+    <option value="{{ y.id }}">{{ y.year }}</option>
+    {% endfor %}
+  </select>
+</div>
+    <div class="mb-3" id="brandDiv"></div>
+    <div class="mb-3" id="modelDiv"></div>
+    <div class="mb-3" id="submodelDiv"></div>
+    <div id="glassTables" x-show="selectedSubmodel"></div>
+  </form>
+</div>
+
+<!-- {% include 'partials/chat.html' %} -->
+
+<!-- Styles -->
+<style>
+  @keyframes glow-flash {
+    0%, 100% { fill: transparent; }
+    50% { fill: rgba(0, 180, 255, 0.2); } /* same as .glass-area:hover */
+  }
+  .glass-glow {
+    animation: glow-flash 0.8s ease-in-out 4;
+  }
+  .car-container { position: relative; width: 100%; max-width: 100%; }
+  .car-image { width: 100%; height: auto; display: block; }
+  .car-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none; /* optional, for debugging */
+  z-index: 10;
+}
+  .glass-area { fill: transparent; cursor: pointer; pointer-events: all; transition: fill 0.2s ease; }
+  .glass-area:hover { fill: rgba(0, 180, 255, 0.2); }
+  .glass-area.selected { fill: rgba(0, 200, 100, 0.3) !important; }
+  .glass-tooltip {
+    position: absolute;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 4px 10px;
+    font-size: 14px;
+    border-radius: 4px;
+    pointer-events: none;
+    white-space: nowrap;
+    z-index: 1000;
+    transform: translate(-50%, -100%);
+  }
+  [x-cloak] { display: none !important; }
+
+</style>
+
+<script>
+function vehicleUI() {
+  return {
+    showFront: true,
+    selectedPart: '',
+    selectedSubmodel: '',
+    tooltip: { text: '', x: 0, y: 0 },
+
+    toggleView() {
+      this.showFront = !this.showFront;
+      this.$nextTick(() => this.persistTooltip());
+    },
+
+    selectPart(el) {
+      this.selectedPart = el.dataset.part;
+
+      // Sync value to hidden input for HTMX
+      const hiddenInput = document.querySelector('input[name="selected_part"]');
+      if (hiddenInput) hiddenInput.value = this.selectedPart;
+
+      this.showTooltip(el);
+
+      this.$nextTick(() => {
+        document.querySelectorAll('.glass-area.selected').forEach(e => e.classList.remove('selected'));
+        el.classList.add('selected');
+
+        const yearDiv = document.getElementById('year')?.closest('.mb-3');
+        if (yearDiv) yearDiv.style.display = '';
+      });
+    },
+
+    showTooltip(el) {
+      const label = el.getAttribute('aria-label') || el.dataset.part || 'Glass Part';
+      const svg = el.ownerSVGElement;
+      const bbox = el.getBBox();
+
+      const point = svg.createSVGPoint();
+      point.x = bbox.x + bbox.width / 2;
+      point.y = bbox.y + bbox.height / 2;
+
+      const screenPoint = point.matrixTransform(svg.getScreenCTM());
+
+      const container = el.closest('.car-container');
+      const tooltipEl = container.querySelector('.glass-tooltip');
+      const containerRect = container.getBoundingClientRect();
+
+      tooltipEl.textContent = label;
+      tooltipEl.style.left = `${screenPoint.x - containerRect.left}px`;
+      tooltipEl.style.top = `${screenPoint.y - containerRect.top}px`;
+      tooltipEl.style.display = 'block';
+    },
+
+    clearTooltip() {
+      if (!this.selectedPart) {
+        document.querySelectorAll('.glass-tooltip').forEach(el => {
+          el.style.display = 'none';
+        });
+      }
+    },
+
+    persistTooltip() {
+      if (!this.selectedPart) return;
+      const el = document.querySelector(`[data-part="${this.selectedPart}"]`);
+      if (el) this.showTooltip(el);
+    },
+
+    init() {
+      // Glow animation for all paths on load
+      this.$nextTick(() => {
+        const paths = document.querySelectorAll('.glass-area');
+        paths.forEach(el => {
+          el.classList.add('glass-glow');
+          el.addEventListener('animationend', () => el.classList.remove('glass-glow'), { once: true });
+        });
+      });
+
+      // Listen for HTMX swap to bind submodel change event
+      document.body.addEventListener('htmx:afterSwap', (evt) => {
+        if (evt.target && evt.target.id === 'submodelDiv') {
+          const submodelSelect = evt.target.querySelector('select[name="submodel"]');
+          if (submodelSelect) {
+            submodelSelect.addEventListener('change', (e) => {
+              this.selectedSubmodel = e.target.value;
+              const glassDiv = document.getElementById('glassTables');
+              if (glassDiv) glassDiv.style.display = 'block';
+            });
+          }
+        }
+      });
+    }
+  };
+}
+</script>
+
+
+{% endblock %}
