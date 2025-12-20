@@ -180,10 +180,10 @@ function vehicleUI() {
         document.body.addEventListener('htmx:afterSwap', (evt) => {
           if (evt.target && evt.target.id === 'brandDiv') {
             enableSelect('#brand');
-            disableSelect('#year');
           } else if (evt.target && evt.target.id === 'modelDiv') {
             enableSelect('#model');
             disableSelect('#brand');
+            disableSelect('#year');
           } else if (evt.target && evt.target.id === 'submodelDiv') {
             const submodelSelect = evt.target.querySelector('select[name="submodel"]');
             if (submodelSelect) {
