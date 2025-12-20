@@ -27,7 +27,7 @@
   <!-- Vehicle Form -->
   <form id="vehicleForm">
     <input type="hidden" id="selected_part" name="selected_part" :value="selectedPart">
-    <div class="mb-3" x-show="selectedPart">
+    <div class="mb-3" x-show="selectedPart" x-cloak>
   <label for="year" class="form-label">Year</label>
   <select id="year" name="year" class="form-select"
           hx-get="/brands"
