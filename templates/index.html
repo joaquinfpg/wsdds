@@ -164,6 +164,14 @@ function vehicleUI() {
         });
       });
 
+      const disableOnSelect = new Set(['year', 'brand', 'model']);
+      document.body.addEventListener('change', (evt) => {
+        const target = evt.target;
+        if (target instanceof HTMLSelectElement && disableOnSelect.has(target.id) && target.value) {
+          setTimeout(() => target.setAttribute('disabled', 'disabled'), 0);
+        }
+      });
+
       // Listen for HTMX swap to bind submodel change event
       document.body.addEventListener('htmx:afterSwap', (evt) => {
         if (evt.target && evt.target.id === 'submodelDiv') {
