@@ -115,7 +115,10 @@ function vehicleUI() {
         el.classList.add('selected');
 
         const yearDiv = document.getElementById('year')?.closest('.mb-3');
-        if (yearDiv) yearDiv.style.display = '';
+        if (yearDiv) {
+          yearDiv.removeAttribute('x-cloak');
+          yearDiv.style.display = '';
+        }
       });
     },
 
