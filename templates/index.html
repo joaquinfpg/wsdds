@@ -167,17 +167,24 @@ function vehicleUI() {
         });
       });
 
-      const disableOnSelect = new Set(['year', 'brand', 'model']);
-      document.body.addEventListener('change', (evt) => {
-        const target = evt.target;
-        if (target instanceof HTMLSelectElement && disableOnSelect.has(target.id) && target.value) {
-          setTimeout(() => target.setAttribute('disabled', 'disabled'), 0);
-        }
-      });
+        const disableSelect = (selector) => {
+          const select = document.querySelector(selector);
+          if (select) select.setAttribute('disabled', 'disabled');
+        };
 
-        // Listen for HTMX swap to bind submodel change event
+        const enableSelect = (selector) => {
+          const select = document.querySelector(selector);
+          if (select) select.removeAttribute('disabled');
+        };
+
         document.body.addEventListener('htmx:afterSwap', (evt) => {
-          if (evt.target && evt.target.id === 'submodelDiv') {
+          if (evt.target && evt.target.id === 'brandDiv') {
+            enableSelect('#brand');
+            disableSelect('#year');
+          } else if (evt.target && evt.target.id === 'modelDiv') {
+            enableSelect('#model');
+            disableSelect('#brand');
+          } else if (evt.target && evt.target.id === 'submodelDiv') {
             const submodelSelect = evt.target.querySelector('select[name="submodel"]');
             if (submodelSelect) {
               submodelSelect.removeAttribute('disabled');
@@ -187,11 +194,7 @@ function vehicleUI() {
                 if (glassDiv) glassDiv.style.display = 'block';
               });
             }
-          } else if (evt.target && evt.target.id === 'modelDiv') {
-            const modelSelect = evt.target.querySelector('select[name="model"]');
-            if (modelSelect) {
-              modelSelect.removeAttribute('disabled');
-            }
+            disableSelect('#model');
           }
         });
     }
