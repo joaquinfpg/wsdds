@@ -58,9 +58,14 @@ SUBMODEL_CHOICES = [
 
 @vpsearch_bp.route("/")
 def index():
-    years = db.session.query(Year).order_by(Year.year.desc()).all()
-    print(f"Years found: {years}")
-    return render_template("index.html", years=years)
+    year_rows = (
+        db.session.query(Year.id.label("id"), Year.year.label("year"))
+        .order_by(Year.year.desc())
+        .all()
+    )
+    year_options = [{"id": row.id, "year": row.year} for row in year_rows]
+    print(f"Years found: {year_options}")
+    return render_template("index.html", years=year_options)
 
 @vpsearch_bp.route("/vehicles", methods=("GET", "POST"))
 def vehicles_page():

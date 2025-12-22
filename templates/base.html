@@ -1,35 +1,182 @@
-<!doctype html>
-<html lang="en" data-bs-theme="dark">
+<!DOCTYPE html>
+<html lang="en" data-theme="night" class="h-full bg-base-200">
+
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{% block title %}WSDDS{% endblock %}</title>
-  <script src="https://unpkg.com/htmx.org@1.9.10"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-  <link rel="preload" as="image" href="/static/front.webp">
-  <link rel="preload" as="image" href="/static/rear.webp">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}WSDDS Portal{% endblock %}</title>
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@5/themes.css" rel="stylesheet" type="text/css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.12.0/dist/cdn.min.js"></script>
+  <style>
+    [x-cloak] {
+      display: none !important;
+    }
+  </style>
 </head>
-<body>
-  <nav class="navbar navbar-dark bg-dark mb-4">
-    <div class="container-fluid">
-      <span class="navbar-brand">Glass Part Search</span>
-      <div class="dropdown">
-        <button class="btn btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-          Explore
-        </button>
-        <ul class="dropdown-menu dropdown-menu-dark">
-          <li><a class="dropdown-item" href="{{ url_for('vpsearch_bp.vehicles_page') }}">Vehicles</a></li>
-          <li><a class="dropdown-item" href="{{ url_for('vpsearch_bp.index') }}">Parts</a></li>
-        </ul>
+
+<body class="min-h-screen w-full bg-base-100 text-base-content">
+  <header>
+    <div class="navbar bg-base-100 shadow-sm">
+      <div class="flex-1">
+        <a class="btn btn-ghost text-xl"><svg class="h-8 w-auto" viewBox="0 0 186.176 29.662" role="img"
+            aria-labelledby="logoTitle logoDesc">
+            <title id="logoTitle">Florida Prime Glass</title>
+            <desc id="logoDesc">Company wordmark</desc>
+            <path fill="#31378A"
+              d="M15.023 16.097H9.657l-.35-6.183-2.986 6.183H.956L0 0h5.365l.699 12.084 3.01-6.205L8.725 0h5.365l.699 12.084L20.621 0h2.17l-7.768 16.097zm10.916 0H20.97L23.7 3.22h4.97l-2.731 12.877zm3.034-14.324h-4.969L24.377 0h4.969l-.373 1.773zm11.896 14.324h-4.945l2.38-11.104h-2.683l-2.379 11.104h-4.969L31.025 3.22h10.591c.591 0 1.03.187 1.318.56s.369.855.245 1.447l-2.31 10.87zm14.277 0H45.045c-.762 0-1.326-.229-1.691-.688-.365-.458-.462-1.068-.291-1.831l1.797-8.351c.123-.592.411-1.074.862-1.447s.972-.56 1.563-.56h5.645L53.606 0h4.946l-3.406 16.097zM49.874 4.992l-1.983 9.332h2.684l1.982-9.332h-2.683zm19.362 3.756c.591 0 1.029.188 1.318.561.287.373.369.855.244 1.445l-.583 2.823c-.155.763-.517 1.373-1.085 1.831a3.043 3.043 0 0 1-1.971.688h-7.582c-.762 0-1.326-.229-1.691-.688-.365-.458-.463-1.068-.291-1.831l.279-1.236h4.969l-.443 1.983h2.684l.816-3.803h-5.133c-.762 0-1.326-.229-1.691-.688-.365-.458-.463-1.069-.291-1.831l.583-2.775a2.458 2.458 0 0 1 .875-1.447c.458-.373.983-.56 1.575-.56h8.584c.591 0 1.03.187 1.318.56.287.373.369.855.244 1.447l-.373 1.749h-4.945l.443-1.983h-2.683l-.816 3.756h5.646zm15.118 7.349h-4.946l2.356-11.104H79.08l-2.355 11.104h-4.969L75.162 0h4.969l-.677 3.22h5.622c.591 0 1.033.187 1.33.56.295.373.381.855.256 1.447l-2.308 10.87zm6.974 0h-4.969L89.088 3.22h4.969l-2.729 12.877zM94.36 1.773h-4.969L89.765 0h4.969l-.374 1.773zm1.236 3.454c.125-.592.416-1.074.875-1.447s.983-.56 1.575-.56h8.584c.591 0 1.03.187 1.318.56s.369.855.245 1.447l-1.54 7.324h-7.628l-.396 1.773h7.628l-.373 1.772H95.806c-.762 0-1.325-.229-1.69-.688-.365-.458-.463-1.068-.292-1.831l1.772-8.35zm5.039-.235-1.236 5.739h2.683l1.236-5.739h-2.683zm12.27 11.105h-4.969L111.343 0h4.969l-3.407 16.097zm14.604 0h-10.102c-.762 0-1.326-.229-1.691-.688-.364-.458-.462-1.068-.291-1.831l1.796-8.351c.125-.592.412-1.074.863-1.447s.972-.56 1.563-.56h5.645l.677-3.22h4.945l-3.405 16.097zm-5.273-11.105-1.982 9.332h2.683l1.982-9.332h-2.683zm19.363 3.756c.591 0 1.03.188 1.318.561.287.373.369.855.245 1.445l-.583 2.823c-.156.763-.518 1.373-1.085 1.831a3.045 3.045 0 0 1-1.972.688h-7.581c-.763 0-1.326-.229-1.691-.688-.365-.458-.463-1.068-.292-1.831l.28-1.236h4.969l-.443 1.983h2.683l.816-3.803h-5.132c-.762 0-1.326-.229-1.691-.688-.365-.458-.463-1.069-.291-1.831l.583-2.775a2.458 2.458 0 0 1 .875-1.447c.458-.373.983-.56 1.574-.56h8.585c.591 0 1.029.187 1.317.56s.369.855.245 1.447l-.373 1.749h-4.945l.443-1.983h-2.684l-.816 3.756h5.646z">
+            </path>
+            <path fill="#EBCC34"
+              d="M149.069 16.097h-3.605l.5-2.397h3.605l-.5 2.397zm12.902-2.251c-.139.682-.462 1.227-.969 1.637a2.728 2.728 0 0 1-1.762.614h-4.605l-.604 2.876h-4.439l3.043-14.381h9.462c.542 0 .941.166 1.198.5s.33.765.219 1.293l-1.543 7.461zm-5.232-7.67-1.771 8.337h2.396l1.772-8.337h-2.397zm17.07 0h-4.314l-2.126 9.921h-4.438l2.063-9.712c.111-.528.372-.959.782-1.293a2.16 2.16 0 0 1 1.406-.5h6.962l-.335 1.584zm1.063.209c.11-.528.371-.959.781-1.293.409-.334.879-.5 1.407-.5h7.67c.527 0 .92.166 1.177.5s.33.765.219 1.293l-1.563 7.461c-.153.682-.479 1.227-.979 1.637a2.686 2.686 0 0 1-1.751.614h-6.773c-.682 0-1.186-.205-1.512-.614-.326-.41-.413-.955-.26-1.637l1.584-7.461zm4.502-.209-1.793 8.337h2.396l1.793-8.337h-2.396z">
+            </path>
+            <path fill="#A02533"
+              d="m37.305 29.443 1.461-8.295h6.451l-.341 1.936h-3.733l-.266 1.51h2.973l-.341 1.936h-2.972l-.514 2.914h-2.718zm7.545 0 1.461-8.295h2.396l-1.462 8.295H44.85zm8.039-6.209c2.131 0 3.224 1.256 2.893 3.133-.39 2.213-2.07 3.25-4.006 3.25-1.935 0-3.246-1.061-2.883-3.123.369-2.096 1.957-3.26 3.996-3.26zm-1.577 3.133c-.2 1.141.138 1.637.749 1.637.645 0 1.123-.496 1.324-1.637.156-.887-.117-1.555-.746-1.52-.818.001-1.207.841-1.327 1.52zm6.004-2.96h2.177l-.216 1.222h.023c.501-.945 1.168-1.395 2.101-1.395.104 0 .203.023.306.035l-.423 2.396c-.157-.022-.321-.069-.483-.069-.979 0-1.556.461-1.785 1.764l-.367 2.084h-2.396l1.063-6.037zm4.166 6.036 1.063-6.036h2.396l-1.063 6.036h-2.396zm1.499-8.513h2.396l-.3 1.705h-2.396l.3-1.705zm6.599 8.513.142-.807c-.694.738-1.255.98-2.026.98-1.82 0-2.501-1.371-2.201-3.076.354-2.005 1.7-3.307 3.141-3.307.76 0 1.258.184 1.659.783l.505-2.869h2.396l-1.461 8.295H69.58zm.359-2.961c.118-.668.016-1.393-.779-1.393s-1.147.76-1.266 1.428c-.111.634-.08 1.371.703 1.371.831.001 1.219-.702 1.342-1.406zm7.174 2.961-.002-.645c-.791.633-1.515.818-2.413.818-1.141 0-2.056-.564-1.834-1.82.483-2.742 4.562-1.498 4.76-2.627.077-.438-.442-.496-.696-.496-.334 0-.795.07-.944.588H73.68c.225-1.278 1.268-2.027 3.652-2.027 2.856 0 2.843 1.061 2.589 2.5l-.497 2.822c-.061.346-.08.519.187.771l-.021.115h-2.477zm.229-2.672c-.85.38-1.854.195-1.992.979-.053.3.198.508.671.508.84 0 1.233-.657 1.321-1.487zm7.119 2.672 1.461-8.295h3.998c2.385 0 3.344 1.096 3.044 2.801-.315 1.785-1.573 2.914-3.958 2.914h-1.371l-.455 2.58h-2.719zm4.643-4.515c.634 0 1.14-.254 1.265-.968.137-.771-.721-.876-1.297-.876h-.771l-.325 1.844h1.128zm4.679-1.521h2.178l-.215 1.222h.022c.501-.945 1.168-1.395 2.101-1.395.104 0 .203.023.305.035l-.422 2.396c-.157-.022-.322-.069-.483-.069-.979 0-1.556.461-1.785 1.764l-.367 2.084H92.72l1.063-6.037zm4.166 6.036 1.063-6.036h2.396l-1.063 6.036h-2.396zm1.5-8.513h2.396l-.301 1.705h-2.396l.301-1.705zm3.204 2.477h2.2l-.158.898c.381-.461 1.237-1.071 2.101-1.071 1.083 0 1.602.461 1.775 1.105.646-.725 1.394-1.105 2.28-1.105 1.763 0 2.141.99 1.851 2.639l-.629 3.57h-2.396l.542-3.076c.156-.887.047-1.244-.587-1.244-.703 0-.949.611-1.076 1.337l-.526 2.983h-2.396l.541-3.076c.156-.887.047-1.244-.587-1.244-.703 0-.948.611-1.076 1.337l-.525 2.983h-2.396l1.062-6.036zm13.126 3.56c-.126.715.344 1.188.978 1.188.381 0 .757-.174.992-.531h2.293c-.679 1.498-2.287 1.994-3.692 1.994-1.936 0-3.238-1.106-2.881-3.135.349-1.98 2.059-3.248 3.993-3.248 2.235 0 3.312 1.544 2.892 3.732h-4.575zm2.393-1.221a.883.883 0 0 0-.875-1.049c-.714 0-1.188.403-1.302 1.049h2.177zm14.757 3.721h-1.751l.04-.818c-.542.53-1.376 1.014-2.678 1.014-2.12 0-3.779-1.37-3.27-4.262.466-2.65 2.446-4.471 5.13-4.471 1.993 0 3.412 1.037 3.387 3.076h-2.58c-.076-.68-.507-1.048-1.21-1.048-1.071 0-1.748.968-2.006 2.431-.207 1.176-.027 2.246 1.344 2.246.553 0 1.322-.38 1.563-.955H129.7l.316-1.798h3.721l-.808 4.585zm1.489-.024 1.462-8.295h2.396l-1.461 8.295h-2.397zm7.948 0-.002-.645c-.791.633-1.515.818-2.413.818-1.141 0-2.055-.564-1.834-1.82.483-2.742 4.561-1.498 4.76-2.627.077-.438-.442-.496-.696-.496-.334 0-.795.07-.944.588h-2.304c.225-1.278 1.267-2.027 3.651-2.027 2.857 0 2.844 1.061 2.59 2.5l-.497 2.822c-.061.346-.08.519.187.771l-.021.115h-2.477zm.229-2.672c-.85.38-1.854.195-1.992.979-.053.3.198.508.671.508.84 0 1.233-.657 1.321-1.487zm5.62.795c-.043.242.017.426.156.553.129.115.324.184.555.184.368 0 .78-.115.855-.541.171-.968-3.663-.195-3.251-2.534.271-1.544 1.952-1.993 3.208-1.993 1.313 0 2.804.299 2.66 1.9h-2.178c.012-.195-.044-.334-.153-.438-.108-.104-.272-.149-.457-.149-.415 0-.702.126-.755.427-.148.84 3.765.275 3.367 2.533-.222 1.256-1.408 2.109-3.62 2.109-1.383 0-2.828-.427-2.669-2.051h2.282zm7.038 0c-.043.242.017.426.156.553.129.115.324.184.555.184.368 0 .78-.115.855-.541.171-.968-3.663-.195-3.251-2.534.271-1.544 1.952-1.993 3.208-1.993 1.313 0 2.804.299 2.66 1.9h-2.178c.012-.195-.044-.334-.152-.438-.109-.104-.273-.149-.458-.149-.415 0-.702.126-.755.427-.148.84 3.765.275 3.367 2.533-.222 1.256-1.408 2.109-3.62 2.109-1.383 0-2.828-.427-2.669-2.051h2.282z">
+            </path>
+          </svg></a>
+      </div>
+      <div class="flex gap-2">
+        {% if current_user.is_authenticated %}
+        {% set _avatar_source = current_user.username or current_user.email or 'S' %}
+        {% set _avatar_initial = _avatar_source[:1]|upper %}
+        <div class="dropdown dropdown-end">
+          <div tabindex="0" role="button" class="btn btn-ghost btn-circle">
+            {% if current_user.profile_picture %}
+            <div class="avatar avatar-online">
+              <div class="ring-primary ring-offset-base-100 w-10 rounded-full ring-2 ring-offset-2">
+                <img src="data:image/png;base64,{{ current_user.profile_picture|b64encode }}" alt="Profile photo" />
+              </div>
+            </div>
+            {% else %}
+            <div class="avatar avatar-placeholder">
+              <div class="bg-neutral text-neutral-content w-10 rounded-full">
+                <span class="text-3xl">{{ _avatar_initial }}</span>
+              </div>
+            </div>
+            {% endif %}
+          </div>
+          <ul tabindex="-1" class="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
+            <li>
+              
+                Dashboard
+                <span class="badge badge-primary">New</span>
+              </a>
+            </li>
+            <li>
+              
+                Stats
+                <span class="badge badge-outline">Live</span>
+              </a>
+            </li>
+            <li>
+              
+                Account
+              </a>
+            </li>
+            <li>
+              
+                Payments
+              </a>
+            </li>
+            <li></li>
+            <li>
+              <label class="swap swap-rotate flex items-center gap-2">
+                <span class="text-xs tracking-wide ">Color Mode</span>
+                <!-- this hidden checkbox controls the state -->
+                <input type="checkbox" class="theme-controller" value="night" {% if _user_prefers_dark %}checked{% endif
+                  %} />
+                <span class="flex gap-1">
+                  <!-- sun icon -->
+                  <svg class="swap-off h-5 w-5 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path
+                      d="M5.64,17l-.71.71a1,1,0,0,0,0,1.41,1,1,0,0,0,1.41,0l.71-.71A1,1,0,0,0,5.64,17ZM5,12a1,1,0,0,0-1-1H3a1,1,0,0,0,0,2H4A1,1,0,0,0,5,12Zm7-7a1,1,0,0,0,1-1V3a1,1,0,0,0-2,0V4A1,1,0,0,0,12,5ZM5.64,7.05a1,1,0,0,0,.7.29,1,1,0,0,0,.71-.29,1,1,0,0,0,0-1.41l-.71-.71A1,1,0,0,0,4.93,6.34Zm12,.29a1,1,0,0,0,.7-.29l.71-.71a1,1,0,1,0-1.41-1.41L17,5.64a1,1,0,0,0,0,1.41A1,1,0,0,0,17.66,7.34ZM21,11H20a1,1,0,0,0,0,2h1a1,1,0,0,0,0-2Zm-9,8a1,1,0,0,0-1,1v1a1,1,0,0,0,2,0V20A1,1,0,0,0,12,19ZM18.36,17A1,1,0,0,0,17,18.36l.71.71a1,1,0,0,0,1.41,0,1,1,0,0,0,0-1.41ZM12,6.5A5.5,5.5,0,1,0,17.5,12,5.51,5.51,0,0,0,12,6.5Zm0,9A3.5,3.5,0,1,1,15.5,12,3.5,3.5,0,0,1,12,15.5Z" />
+                  </svg>
+                  <!-- moon icon -->
+                  <svg class="swap-on h-5 w-5 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path
+                      d="M21.64,13a1,1,0,0,0-1.05-.14,8.05,8.05,0,0,1-3.37.73A8.15,8.15,0,0,1,9.08,5.49a8.59,8.59,0,0,1,.25-2A1,1,0,0,0,8,2.36,10.14,10.14,0,1,0,22,14.05,1,1,0,0,0,21.64,13Zm-9.5,6.69A8.14,8.14,0,0,1,7.08,5.22v.27A10.15,10.15,0,0,0,17.22,15.63a9.79,9.79,0,0,0,2.1-.22A8.11,8.11,0,0,1,12.14,19.73Z" />
+                  </svg>
+                </span>
+              </label>
+            </li>
+            <li><a href="{{ url_for('auth.logout') }}">Logout</a></li>
+          </ul>
+        </div>
+        {% endif %}
       </div>
     </div>
-  </nav>
+    </div>
+  </header>
+  <main class="flex-1 w-full">
+    <div class="mx-auto flex max-w-6xl flex-col gap-4 px-6 py-6">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+      <div class="space-y-3">
+        {% for category, message in messages %}
+        {% set alert_tone = 'error' if category == 'danger' else category %}
+        <div x-data="{ visible: true }" x-init="setTimeout(() => (visible = false), 4200)" x-show="visible" x-transition
+          class="alert alert-{{ alert_tone }} rounded-xl border border-base-200 shadow-lg">
+          <span>{{ message }}</span>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+      {% endwith %}
 
-  <main class="container">
-    {% block content %}{% endblock %}
+      {% block content %}{% endblock %}
+    </div>
   </main>
+  <footer class="border-t border-base-200 bg-base-100/60 py-4">
+    <div
+      class="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-6 text-sm text-base-content/70 sm:flex-row">
+      <p>Florida Prime Glass © 2025</p>
+    </div>
+  </footer>
+  </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  {% block scripts %}{% endblock %}
+  <script>
+    (() => {
+      const htmlEl = document.documentElement;
+      const themeToggle = document.querySelector('.theme-controller');
+      if (!themeToggle) {
+        return;
+      }
+
+      const THEME_DARK = 'night';
+      const THEME_LIGHT = 'winter';
+      const endpoint = '{{ url_for("auth.update_theme_preference") }}';
+
+      const applyTheme = (useDark) => {
+        htmlEl.setAttribute('data-theme', useDark ? THEME_DARK : THEME_LIGHT);
+      };
+
+      const persistPreference = async (prefersDark) => {
+        try {
+          const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            credentials: 'same-origin',
+            body: JSON.stringify({ isdark: prefersDark }),
+          });
+          if (!response.ok) {
+            console.error('Unable to save theme preference', response.status);
+          }
+        } catch (error) {
+          console.error('Unable to save theme preference', error);
+        }
+      };
+
+      themeToggle.addEventListener('change', (event) => {
+        const prefersDark = event.target.checked;
+        applyTheme(prefersDark);
+        persistPreference(prefersDark);
+      });
+
+      applyTheme(themeToggle.checked);
+    })();
+  </script>  
 </body>
 </html>

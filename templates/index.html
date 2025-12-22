@@ -22,29 +22,33 @@
     <div id="global-tooltip-rear" class="glass-tooltip" style="display: none;"></div>
   </div> 
 
-</div>
-<div>
-  <!-- Vehicle Form -->
-  <form id="vehicleForm">
-    <input type="hidden" id="selected_part" name="selected_part" :value="selectedPart">
-    <div class="mb-3" x-show="selectedPart" x-cloak>
-  <label for="year" class="form-label">Year</label>
-  <select id="year" name="year" class="form-select"
-          hx-get="/brands"
-          hx-target="#brandDiv"
-          hx-trigger="change"
-          hx-include="#year">
-    <option selected disabled>Select Year</option>
-    {% for y in years %}
-    <option value="{{ y.id }}">{{ y.year }}</option>
-    {% endfor %}
-  </select>
-</div>
-    <div class="mb-3" id="brandDiv"></div>
-    <div class="mb-3" id="modelDiv"></div>
-    <div class="mb-3" id="submodelDiv"></div>
-    <div id="glassTables" x-show="selectedSubmodel"></div>
-  </form>
+  <div>
+    <!-- Vehicle Form -->
+    <form id="vehicleForm">
+      <input type="hidden" id="selected_part" name="selected_part" :value="selectedPart">
+      <div class="mb-3" x-show="selectedPart && !showTagVinPartial" x-cloak>
+        <label for="year" class="form-label">Year</label>
+        <select id="year" name="year" class="form-select"
+                hx-get="/brands"
+                hx-target="#brandDiv"
+                hx-trigger="change"
+                hx-include="#year"
+                :disabled="showTagVinPartial">
+          <option selected disabled>Select Year</option>
+          {% for y in years %}
+          <option value="{{ y.id }}">{{ y.year }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="mb-3" id="brandDiv"></div>
+      <div class="mb-3" id="modelDiv"></div>
+      <div class="mb-3" id="submodelDiv"></div>
+      <div id="glassTables" x-show="selectedSubmodel"></div>
+    </form>
+    <div x-show="showTagVinPartial" x-cloak class="mt-4">
+      {% include 'partials/tag_vin.html' %}
+    </div>
+  </div>
 </div>
 
 <!-- {% include 'partials/chat.html' %} -->
@@ -88,13 +92,32 @@
 
 </style>
 
+<script id="years-json" type="application/json">
+  {{ years|tojson }}
+</script>
+
 <script>
+const YEAR_LOOKUP = (function() {
+  const jsonScript = document.getElementById('years-json');
+  const data = jsonScript ? JSON.parse(jsonScript.textContent || '[]') : [];
+  const map = {};
+  (data || []).forEach(item => {
+    if (item?.id) {
+      map[String(item.id)] = Number(item.year || 0);
+    }
+  });
+  return map;
+})();
+
 function vehicleUI() {
   return {
     showFront: true,
     selectedPart: '',
     selectedSubmodel: '',
     tooltip: { text: '', x: 0, y: 0 },
+    selectedYearId: '',
+    yearLookup: YEAR_LOOKUP,
+    showTagVinPartial: false,
 
     toggleView() {
       this.showFront = !this.showFront;
@@ -103,6 +126,10 @@ function vehicleUI() {
 
     selectPart(el) {
       this.selectedPart = el.dataset.part;
+      const yearSelect = document.getElementById('year');
+      if (yearSelect) {
+        this.selectedYearId = yearSelect.value;
+      }
 
       // Sync value to hidden input for HTMX
       const hiddenInput = document.querySelector('input[name="selected_part"]');
@@ -120,6 +147,12 @@ function vehicleUI() {
           yearDiv.style.display = '';
         }
       });
+      this.updateTagVinVisibility();
+    },
+
+    updateTagVinVisibility() {
+      const yearValue = this.selectedYearId ? this.yearLookup[this.selectedYearId] : null;
+      this.showTagVinPartial = typeof yearValue === 'number' && yearValue >= 2005 && this.selectedPart === 'ws';
     },
 
     showTooltip(el) {
@@ -197,6 +230,13 @@ function vehicleUI() {
             disableSelect('#model');
           }
         });
+        const yearSelect = document.getElementById('year');
+        if (yearSelect) {
+          yearSelect.addEventListener('change', (event) => {
+            this.selectedYearId = event.target.value;
+            this.updateTagVinVisibility();
+          });
+        }
     }
   };
 }
