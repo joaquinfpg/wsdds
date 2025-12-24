@@ -40,6 +40,11 @@ def create_app():
     app.register_blueprint(claims_bp)
     app.register_blueprint(chat_bp, url_prefix='/chat')
 
+    def user_attr(obj, name, default=''):
+        return getattr(obj, name, default)
+
+    app.jinja_env.globals['user_attr'] = user_attr
+
 
     return app
 

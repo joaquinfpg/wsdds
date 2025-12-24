@@ -44,7 +44,7 @@
             {% if current_user.profile_picture %}
             <div class="avatar avatar-online">
               <div class="ring-primary ring-offset-base-100 w-10 rounded-full ring-2 ring-offset-2">
-                <img src="data:image/png;base64,{{ current_user.profile_picture|b64encode }}" alt="Profile photo" />
+                <img src="{{ url_for('claims.account_avatar', filename=current_user.profile_picture) }}" alt="Profile photo" />
               </div>
             </div>
             {% else %}
@@ -57,26 +57,22 @@
           </div>
           <ul tabindex="-1" class="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
             <li>
-              
-                Dashboard
+              <a class="flex items-center justify-between gap-2" href="{{ url_for('claims.claim_list') }}">
+                <span>Dashboard</span>
                 <span class="badge badge-primary">New</span>
               </a>
             </li>
             <li>
-              
-                Stats
+              <a class="flex items-center justify-between gap-2" href="{{ url_for('claims.stats_view') }}">
+                <span>Stats</span>
                 <span class="badge badge-outline">Live</span>
               </a>
             </li>
             <li>
-              
-                Account
-              </a>
+              <a href="{{ url_for('claims.saccount') }}">Account</a>
             </li>
             <li>
-              
-                Payments
-              </a>
+              <a href="{{ url_for('claims.payments') }}">Payments</a>
             </li>
             <li></li>
             <li>
