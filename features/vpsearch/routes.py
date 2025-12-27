@@ -65,7 +65,7 @@ def index():
     )
     year_options = [{"id": row.id, "year": row.year} for row in year_rows]
     print(f"Years found: {year_options}")
-    return render_template("index.html", years=year_options)
+    return render_template("quote.html", years=year_options)
 
 @vpsearch_bp.route("/vehicles", methods=("GET", "POST"))
 def vehicles_page():

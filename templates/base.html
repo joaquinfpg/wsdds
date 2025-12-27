@@ -71,6 +71,11 @@
             <li>
               <a href="{{ url_for('claims.saccount') }}">Account</a>
             </li>
+            {% if user_has_any_role(current_user, ['SuperAdmin', 'Admin']) %}
+            <li>
+              <a class="text-warning" href="{{ url_for('admin.dashboard') }}">Admin</a>
+            </li>
+            {% endif %}
             <li>
               <a href="{{ url_for('claims.payments') }}">Payments</a>
             </li>
