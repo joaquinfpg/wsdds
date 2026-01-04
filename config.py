@@ -36,3 +36,12 @@ class Config:
     PASSWORD_RESET_TOKEN_MAX_AGE = _env_int("PASSWORD_RESET_TOKEN_MAX_AGE", 3600)
     EMAIL_VERIFICATION_SALT = os.environ.get("EMAIL_VERIFICATION_SALT") or "email-verification"
     EMAIL_VERIFICATION_TOKEN_MAX_AGE = _env_int("EMAIL_VERIFICATION_TOKEN_MAX_AGE", 86400)
+    GOOGLE_MAPS_API_KEY = os.environ.get("GOOGLE_MAPS_API_KEY", "")
+    TAX_BANDITS_API_BASE_URL = os.environ.get("TAX_BANDITS_API_BASE_URL", "https://api.taxbandits.com/api/v1")
+    TAX_BANDITS_API_AUTH_PATH = os.environ.get("TAX_BANDITS_API_AUTH_PATH", "Authentication/CreateAccessToken")
+    TAX_BANDITS_TIN_MATCH_PATH = os.environ.get("TAX_BANDITS_TIN_MATCH_PATH", "TINMatchingRecipients")
+    TAX_BANDITS_USERNAME = os.environ.get("TAX_BANDITS_USERNAME", "")
+    TAX_BANDITS_PASSWORD = os.environ.get("TAX_BANDITS_PASSWORD", "")
+    TAX_BANDITS_REQUESTER_NAME = os.environ.get("TAX_BANDITS_REQUESTER_NAME", "")
+    TAX_BANDITS_REQUESTER_TIN = os.environ.get("TAX_BANDITS_REQUESTER_TIN", "")
+    TAX_BANDITS_WEBHOOK_SECRET = os.environ.get("TAX_BANDITS_WEBHOOK_SECRET", "")

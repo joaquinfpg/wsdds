@@ -8,8 +8,11 @@ from features.chat import chat_bp
 from features.auth.routes import auth_bp
 from features.claims.routes import claims_bp
 from features.admin_routes import admin_bp
+from features.txtrack.routes import txtrack_bp
 from features.users.models import User
 import features.locations.models  # ensure location/dealership tables exist
+import features.counterparties.models  # ensure counterparties tables are registered
+import features.txtrack.models  # ensure txtrack tables exist
 
 
 login_manager = LoginManager()
@@ -33,11 +36,14 @@ def create_app():
 
     db.init_app(app)
     login_manager.init_app(app)
+    with app.app_context():
+        db.create_all()
     app.register_blueprint(vpsearch_bp)
     app.register_blueprint(agpro_api_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(claims_bp)
     app.register_blueprint(admin_bp)
+    app.register_blueprint(txtrack_bp)
     app.register_blueprint(chat_bp, url_prefix='/chat')
 
     def user_attr(obj, name, default=''):
